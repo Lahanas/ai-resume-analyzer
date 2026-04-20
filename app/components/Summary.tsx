@@ -10,7 +10,7 @@ const Category = ({title, score }: {title: string, score: number}) => {
         <div className="resume-summary">
             {title} - {score}
             <div className="category">
-                <div> className="flex flex-row gap-2 items-center justify-center">
+                <div className="flex flex-row gap-2 items-center justify-center">
                     <p className="text-2xl">{title}</p>
 
                 </div>
