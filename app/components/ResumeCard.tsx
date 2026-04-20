@@ -3,7 +3,8 @@ import ScoreCircle from "~/components/ScoreCircle";
 import {useEffect, useState} from "react";
 import {usePuterStore} from "~/lib/puter";
 
-const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath } }: { resume: Resume }) => {
+const ResumeCard = ({ resume: { id, companyName, compagnyName, jobTitle, feedback, imagePath } }: { resume: Resume & { compagnyName?: string } }) => {
+    const company = companyName || compagnyName;
     const { fs } = usePuterStore();
     const [resumeUrl, setResumeUrl] = useState('');
 
@@ -22,9 +23,9 @@ const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath }
         <Link to={`/resume/${id}`}className={ "resume-card animate-in fade-in duration-1000"}>
             <div className={ "resume-card-header" }>
                 <div className="flex flex-col gap-2">
-                    {companyName &&  <h2 className="!text-black font-bold break-words">{companyName}</h2>}
+                    {company &&  <h2 className="!text-black font-bold break-words">{company}</h2>}
                     {jobTitle && <h3 className="text-lg break-words text-gray-500">{jobTitle}</h3>}
-                    {!companyName && !jobTitle && <h2 className="!text-black font-bold">Resume</h2>}
+                    {!company && !jobTitle && <h2 className="!text-black font-bold">Resume</h2>}
                 </div>
                 <div className="flex-shrink-0">
                     <ScoreCircle score={feedback.overallScore} />
@@ -34,7 +35,7 @@ const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath }
                 <div className="gradient-border animate-in fade-in duration-1000">
                 <div className="w-full h-full">
                     <img
-                         src={imagePath}
+                         src={resumeUrl}
                          alt="resume"
                          className="w-full h-[350px] max-sm:h-[200px] object-cover object-top"
                     />
