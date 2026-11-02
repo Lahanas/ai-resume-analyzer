@@ -18,7 +18,7 @@ const Upload = () => {
         setFile(file)
     }
 
-    const handleAnalyze = async ({compagnyName, jobTitle, jobDescription, file}: {compagnyName: string, jobTitle: string, jobDescription: string, file: File}) => {
+    const handleAnalyze = async ({companyName, jobTitle, jobDescription, file}: {companyName: string, jobTitle: string, jobDescription: string, file: File}) => {
         setIsProcessing(true);
         setStatusText('Uploading the file...');
         const uploadedFile = await fs.upload([file]);
@@ -38,7 +38,7 @@ const Upload = () => {
             id: uuid,
             resumePath: uploadedFile.path,
             imagePath: uploadedImage.path,
-            compagnyName, jobTitle, jobDescription,
+            companyName, jobTitle, jobDescription,
             feedback: '',
         }
         await kv.set(`resume:${uuid}`, JSON.stringify(data));
@@ -67,13 +67,13 @@ const Upload = () => {
         if (!form) return;
         const formData = new FormData(form);
 
-        const compagnyName = formData.get('compagny-name') as string;
+        const companyName = formData.get('company-name') as string;
         const jobTitle = formData.get('job-title') as string;
         const jobDescription = formData.get('job-description') as string;
 
         if (!file) return;
 
-        handleAnalyze({compagnyName, jobTitle, jobDescription, file}).catch((e) => {
+        handleAnalyze({companyName, jobTitle, jobDescription, file}).catch((e) => {
             console.error(e);
             setStatusText('Error: Something went wrong');
             setIsProcessing(false);
@@ -98,8 +98,8 @@ const Upload = () => {
                     {!isProcessing && (
                         <form id="upload-form" onSubmit={handleSubmit} className="flex flex-col gap-4 mt-8">
                             <div className="form-div">
-                                <label htmlFor="compagny-name">Compagny Name</label>
-                                <input type="text" name="compagny-name" placeholder="Compagny Name" id="compagny-name" />
+                                <label htmlFor="company-name">Company Name</label>
+                                <input type="text" name="company-name" placeholder="Company Name" id="company-name" />
                             </div>
                             <div className="form-div">
                                 <label htmlFor="job-title">Job Title</label>
