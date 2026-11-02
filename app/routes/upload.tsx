@@ -20,17 +20,23 @@ const Upload = () => {
 
     const handleAnalyze = async ({companyName, jobTitle, jobDescription, file}: {companyName: string, jobTitle: string, jobDescription: string, file: File}) => {
         setIsProcessing(true);
+
+        const fail = (message: string) => {
+            setStatusText(message);
+            setIsProcessing(false);
+        }
+
         setStatusText('Uploading the file...');
         const uploadedFile = await fs.upload([file]);
-        if (!uploadedFile) return setStatusText('Error: Failed to upload file');
+        if (!uploadedFile) return fail('Error: Failed to upload file');
 
         setStatusText('Converting to image...');
         const imageFile = await convertPdfToImage(file);
-        if (!imageFile.file) return setStatusText('Error: Failed to convert PDF to image');
+        if (!imageFile.file) return fail('Error: Failed to convert PDF to image');
 
         setStatusText('Uploading the image...');
         const uploadedImage = await fs.upload([imageFile.file]);
-        if (!uploadedImage) return setStatusText('Error: Failed to upload image');
+        if (!uploadedImage) return fail('Error: Failed to upload image');
 
         setStatusText('Preparing data...');
         const uuid = generateUUID();
@@ -48,16 +54,24 @@ const Upload = () => {
             uploadedFile.path,
             prepareInstructions({jobTitle, jobDescription})
         )
-        if (!feedback) return setStatusText('Error: Failed to analyze resume');
+        if (!feedback) return fail('Error: Failed to analyze resume');
 
         const feedbackText = typeof feedback.message.content === 'string'
             ? feedback.message.content
             : feedback.message.content[0].text;
 
-        data.feedback = JSON.parse(feedbackText);
+        // models sometimes wrap JSON in a markdown code fence despite instructions not to
+        const cleanedFeedback = feedbackText.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '');
+
+        try {
+            data.feedback = JSON.parse(cleanedFeedback);
+        } catch (e) {
+            console.error('Failed to parse AI feedback:', feedbackText);
+            return fail('Error: Received an unreadable response, please try again');
+        }
+
         await kv.set(`resume:${uuid}`, JSON.stringify(data))
         setStatusText('Analysis complete, redirecting...');
-        console.log(data);
         navigate(`/resume/${uuid}`);
     }
 
