@@ -6,6 +6,8 @@ import {useNavigate} from "react-router";
 import {generateUUID} from "~/lib/utils";
 import {prepareInstructions} from "../../constants";
 import {convertPdfToImage} from "~/lib/pdf2img";
+import {extractResumeText} from "~/lib/resumeText";
+import {analyzeKeywordMatch} from "~/lib/keywordMatch";
 
 const Upload = () => {
     const {auth, isLoading, fs, ai, kv} = usePuterStore();
@@ -38,6 +40,10 @@ const Upload = () => {
         const uploadedImage = await fs.upload([imageFile.file]);
         if (!uploadedImage) return fail('Error: Failed to upload image');
 
+        setStatusText('Reading resume text...');
+        const resumeText = await extractResumeText(file).catch(() => '');
+        const keywordMatch = analyzeKeywordMatch(resumeText, jobDescription) ?? undefined;
+
         setStatusText('Preparing data...');
         const uuid = generateUUID();
         const data = {
@@ -46,6 +52,7 @@ const Upload = () => {
             imagePath: uploadedImage.path,
             companyName, jobTitle, jobDescription,
             feedback: '',
+            keywordMatch,
         }
         await kv.set(`resume:${uuid}`, JSON.stringify(data));
 

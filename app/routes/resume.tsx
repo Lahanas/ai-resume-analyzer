@@ -4,6 +4,7 @@ import {usePuterStore} from "~/lib/puter";
 import Summary from "~/components/Summary";
 import Details from "~/components/Details";
 import ATS from "~/components/ATS";
+import KeywordMatch from "~/components/KeywordMatch";
 
 export const meta = () =>([
     {title: 'Resumind | Review'},
@@ -16,6 +17,7 @@ const Resume = () => {
     const [imageUrl, setImageUrl] = useState('');
     const [resumeUrl, setResumeUrl] = useState('');
     const [feedback, setFeedback] = useState<Feedback | null> (null);
+    const [keywordMatch, setKeywordMatch] = useState<KeywordMatch | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -43,7 +45,7 @@ const Resume = () => {
                 setImageUrl(imageUrl);
 
                 setFeedback(data.feedback);
-                console.log({resumeUrl, imageUrl, feedback: data.feedback});
+                setKeywordMatch(data.keywordMatch ?? null);
             }
             loadResume();
             }, [id]);
@@ -75,6 +77,7 @@ const Resume = () => {
                     {feedback ?(
                         <div className="flex flex-col gap-8 animate-in fade-in duration-1000">
                             <Summary feedback={feedback} />
+                            {keywordMatch && <KeywordMatch keywordMatch={keywordMatch} />}
                             <ATS score={feedback.ATS.score || 0} suggestions={feedback.ATS.tips || []} />
                             <Details feedback={feedback} />
                         </div>

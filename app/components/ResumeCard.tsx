@@ -3,7 +3,8 @@ import ScoreCircle from "~/components/ScoreCircle";
 import {useEffect, useState} from "react";
 import {usePuterStore} from "~/lib/puter";
 
-const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath } }: { resume: Resume }) => {
+const ResumeCard = ({ resume, onDelete }: { resume: Resume; onDelete?: (resume: Resume) => void }) => {
+    const { id, companyName, jobTitle, feedback, imagePath } = resume;
     const { fs } = usePuterStore();
     const [resumeUrl, setResumeUrl] = useState('');
 
@@ -19,7 +20,20 @@ const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath }
     }, [imagePath]);
 
     return (
-        <Link to={`/resume/${id}`}className={ "resume-card animate-in fade-in duration-1000"}>
+        <Link to={`/resume/${id}`}className={ "resume-card animate-in fade-in duration-1000 relative" }>
+            {onDelete && (
+                <button
+                    className="absolute top-4 right-4 z-10 bg-white rounded-full p-1.5 shadow-sm cursor-pointer"
+                    title="Delete this resume"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onDelete(resume);
+                    }}
+                >
+                    <img src="/icons/cross.svg" alt="delete" className="w-3 h-3" />
+                </button>
+            )}
             <div className={ "resume-card-header" }>
                 <div className="flex flex-col gap-2">
                     {companyName &&  <h2 className="!text-black font-bold break-words">{companyName}</h2>}

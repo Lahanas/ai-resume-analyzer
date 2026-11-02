@@ -1,3 +1,9 @@
+interface KeywordMatch {
+    matchPercentage: number;
+    matched: string[];
+    missing: string[];
+}
+
 interface Resume {
     id: string;
     companyName?: string;
@@ -5,6 +11,7 @@ interface Resume {
     imagePath: string;
     resumePath: string;
     feedback: Feedback;
+    keywordMatch?: KeywordMatch;
 }
 
 interface Feedback {
